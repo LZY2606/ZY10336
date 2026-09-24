@@ -1276,26 +1276,13 @@ namespace MaxMind.Db.SourceGenerator.Test
             IEnumerable<MetadataReference>? additionalReferences = null
             )
         {
-            var parseOptions = new CSharpParseOptions(languageVersion);
-            var references = additionalReferences == null
-                ? References
-                : References.AddRange(additionalReferences);
-            var compilation = CSharpCompilation.Create(
-                "GeneratorTests",
-                [CSharpSyntaxTree.ParseText(source, parseOptions)],
-                references,
-                new CSharpCompilationOptions(
-                    OutputKind.DynamicallyLinkedLibrary,
-                    nullableContextOptions: NullableContextOptions.Enable,
-                    generalDiagnosticOption: warningsAsErrors
-                        ? ReportDiagnostic.Error
-                        : ReportDiagnostic.Default));
-            GeneratorDriver driver = CSharpGeneratorDriver.Create(
-                [new MaxMindDbSourceGenerator().AsSourceGenerator()],
-                parseOptions: parseOptions,
-                optionsProvider: new TestAnalyzerConfigOptionsProvider(aotDiagnostics));
-
-            driver = driver.RunGeneratorsAndUpdateCompilation(
+            var compilation = CreateCompilation(
+                [source],
+                languageVersion,
+                additionalReferences,
+                warningsAsErrors);
+            var driver = CreateDriver(aotDiagnostics, languageVersion)
+                .RunGeneratorsAndUpdateCompilation(
                 compilation,
                 out var outputCompilation,
                 out var generatorDiagnostics);
@@ -1313,6 +1300,37 @@ namespace MaxMind.Db.SourceGenerator.Test
                 errors,
                 runResult.Diagnostics);
         }
+
+        internal static CSharpCompilation CreateCompilation(
+            IEnumerable<string> sources,
+            LanguageVersion languageVersion = LanguageVersion.CSharp12,
+            IEnumerable<MetadataReference>? additionalReferences = null,
+            bool warningsAsErrors = false
+            )
+        {
+            var parseOptions = new CSharpParseOptions(languageVersion);
+            var references = additionalReferences == null
+                ? References
+                : References.AddRange(additionalReferences);
+            return CSharpCompilation.Create(
+                "GeneratorTests",
+                sources.Select(source => CSharpSyntaxTree.ParseText(source, parseOptions)),
+                references,
+                new CSharpCompilationOptions(
+                    OutputKind.DynamicallyLinkedLibrary,
+                    nullableContextOptions: NullableContextOptions.Enable,
+                    generalDiagnosticOption: warningsAsErrors
+                        ? ReportDiagnostic.Error
+                        : ReportDiagnostic.Default));
+        }
+
+        internal static GeneratorDriver CreateDriver(
+            bool aotDiagnostics,
+            LanguageVersion languageVersion = LanguageVersion.CSharp12
+            ) => CSharpGeneratorDriver.Create(
+                [new MaxMindDbSourceGenerator().AsSourceGenerator()],
+                parseOptions: new CSharpParseOptions(languageVersion),
+                optionsProvider: new TestAnalyzerConfigOptionsProvider(aotDiagnostics));
 
         private static MetadataReference CompileReference(string source)
         {
@@ -1348,7 +1366,7 @@ namespace MaxMind.Db.SourceGenerator.Test
             return references.Values.ToImmutableArray();
         }
 
-        private sealed class GeneratorResult
+        internal sealed class GeneratorResult
         {
             internal GeneratorResult(
                 string source,

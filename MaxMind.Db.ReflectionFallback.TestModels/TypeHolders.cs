@@ -59,17 +59,21 @@ namespace MaxMind.Db.ReflectionFallback.TestModels
         public ReflectionNonexistant(
             [MapKey("innerNonexistant", true)] ReflectionInnerNonexistant innerNonexistant,
             [Inject("injected")] string injected,
-            [Network] Network network
+            [Network] Network network,
+            // Mirrors the repeated network parameter on the generated-side model.
+            [Network] Network network2
             )
         {
             Injected = injected;
             InnerNonexistant = innerNonexistant;
             Network = network;
+            Network2 = network2;
         }
 
         public string Injected { get; }
         public ReflectionInnerNonexistant InnerNonexistant { get; }
         public Network Network { get; }
+        public Network Network2 { get; }
     }
 
     public class ReflectionTypeHolder
@@ -139,6 +143,30 @@ namespace MaxMind.Db.ReflectionFallback.TestModels
         public ReflectionPropInnerMapX? MapX { get; set; }
     }
 
+    public class ReflectionPropInnerNonexistant
+    {
+        [Inject("injected")]
+        public string? Injected { get; set; }
+
+        [Network]
+        public Network? Network { get; set; }
+    }
+
+    public class ReflectionPropNonexistant
+    {
+        [MapKey("innerNonexistant", true)]
+        public ReflectionPropInnerNonexistant? InnerNonexistant { get; set; }
+
+        [Inject("injected")]
+        public string? Injected { get; set; }
+
+        [Network]
+        public Network? Network { get; set; }
+
+        [Network]
+        public Network? Network2 { get; set; }
+    }
+
     public class ReflectionPropTypeHolder
     {
         [MapKey("array")]
@@ -182,5 +210,10 @@ namespace MaxMind.Db.ReflectionFallback.TestModels
 
         [MapKey("utf8_string")]
         public string? Utf8String { get; set; }
+
+        [MapKey("nonexistant", true)]
+        public ReflectionPropNonexistant? Nonexistant { get; set; }
+
+        public string UnannotatedDefault { get; set; } = "should stay default";
     }
 }

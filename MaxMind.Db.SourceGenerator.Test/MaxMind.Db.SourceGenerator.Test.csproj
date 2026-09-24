@@ -13,6 +13,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- Shared diagnostic contract cases, consumed together with MaxMind.Db.Test. -->
+    <Compile Include="..\MaxMind.Db.Test\Contract\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\MaxMind.Db\MaxMind.Db.csproj" />
     <ProjectReference Include="..\MaxMind.Db.SourceGenerator\MaxMind.Db.SourceGenerator.csproj" />
   </ItemGroup>
