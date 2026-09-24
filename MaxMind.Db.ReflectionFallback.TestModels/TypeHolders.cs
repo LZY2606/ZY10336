@@ -59,17 +59,20 @@ namespace MaxMind.Db.ReflectionFallback.TestModels
         public ReflectionNonexistant(
             [MapKey("innerNonexistant", true)] ReflectionInnerNonexistant innerNonexistant,
             [Inject("injected")] string injected,
-            [Network] Network network
+            [Network] Network network,
+            [Network] Network network2
             )
         {
             Injected = injected;
             InnerNonexistant = innerNonexistant;
             Network = network;
+            Network2 = network2;
         }
 
         public string Injected { get; }
         public ReflectionInnerNonexistant InnerNonexistant { get; }
         public Network Network { get; }
+        public Network Network2 { get; }
     }
 
     public class ReflectionTypeHolder
@@ -124,31 +127,55 @@ namespace MaxMind.Db.ReflectionFallback.TestModels
     public class ReflectionPropInnerMapX
     {
         [MapKey("arrayX")]
-        public LinkedList<long>? ArrayX { get; set; }
+        public LinkedList<long> ArrayX { get; set; } = new();
 
         [Network]
         public Network? Network { get; set; }
 
         [MapKey("utf8_stringX")]
-        public string? Utf8StringX { get; set; }
+        public string Utf8StringX { get; set; } = "";
     }
 
     public class ReflectionPropInnerMap
     {
         [MapKey("mapX")]
-        public ReflectionPropInnerMapX? MapX { get; set; }
+        public ReflectionPropInnerMapX MapX { get; set; } = new();
+    }
+
+    public class ReflectionPropInnerNonexistant
+    {
+        [Inject("injected")]
+        public string Injected { get; set; } = "";
+
+        [Network]
+        public Network? Network { get; set; }
+    }
+
+    public class ReflectionPropNonexistant
+    {
+        [MapKey("innerNonexistant", true)]
+        public ReflectionPropInnerNonexistant InnerNonexistant { get; set; } = new();
+
+        [Inject("injected")]
+        public string Injected { get; set; } = "";
+
+        [Network]
+        public Network? Network { get; set; }
+
+        [Network]
+        public Network? Network2 { get; set; }
     }
 
     public class ReflectionPropTypeHolder
     {
         [MapKey("array")]
-        public ICollection<long>? Array { get; set; }
+        public ICollection<long> Array { get; set; } = new List<long>();
 
         [MapKey("boolean")]
         public bool Boolean { get; set; }
 
         [MapKey("bytes")]
-        public byte[]? Bytes { get; set; }
+        public byte[] Bytes { get; set; } = [];
 
         [MapKey("double")]
         public double Double { get; set; }
@@ -160,13 +187,18 @@ namespace MaxMind.Db.ReflectionFallback.TestModels
         public int Int32 { get; set; }
 
         [MapKey("map")]
-        public ReflectionPropInnerMap? Map { get; set; }
+        public ReflectionPropInnerMap Map { get; set; } = new();
+
+        [MapKey("nonexistant", true)]
+        public ReflectionPropNonexistant Nonexistant { get; set; } = new();
 
         [Inject("injected")]
         public string? Injected { get; set; }
 
         [Network]
         public Network? Network { get; set; }
+
+        public string UnannotatedDefault { get; set; } = "should stay default";
 
         [MapKey("uint128")]
         public BigInteger Uint128 { get; set; }
@@ -181,6 +213,80 @@ namespace MaxMind.Db.ReflectionFallback.TestModels
         public ulong Uint64 { get; set; }
 
         [MapKey("utf8_string")]
-        public string? Utf8String { get; set; }
+        public string Utf8String { get; set; } = "";
+    }
+
+    // No-network mirrors of the PropNoNetworkTypeHolder shape used by the
+    // enumeration tests, so both activators can be compared over FindAll.
+    public class ReflectionPropNNInnerMapX
+    {
+        [MapKey("arrayX")]
+        public LinkedList<long> ArrayX { get; set; } = new();
+
+        [MapKey("utf8_stringX")]
+        public string Utf8StringX { get; set; } = "";
+    }
+
+    public class ReflectionPropNNInnerMap
+    {
+        [MapKey("mapX")]
+        public ReflectionPropNNInnerMapX MapX { get; set; } = new();
+    }
+
+    public class ReflectionPropNNInnerNonexistant
+    {
+        [Inject("injected")]
+        public string Injected { get; set; } = "";
+    }
+
+    public class ReflectionPropNNNonexistant
+    {
+        [MapKey("innerNonexistant", true)]
+        public ReflectionPropNNInnerNonexistant InnerNonexistant { get; set; } = new();
+
+        [Inject("injected")]
+        public string Injected { get; set; } = "";
+    }
+
+    public class ReflectionPropNoNetworkTypeHolder
+    {
+        [MapKey("array")]
+        public ICollection<long> Array { get; set; } = new List<long>();
+
+        [MapKey("boolean")]
+        public bool Boolean { get; set; }
+
+        [MapKey("bytes")]
+        public byte[] Bytes { get; set; } = [];
+
+        [MapKey("double")]
+        public double Double { get; set; }
+
+        [MapKey("float")]
+        public float Float { get; set; }
+
+        [MapKey("int32")]
+        public int Int32 { get; set; }
+
+        [MapKey("map")]
+        public ReflectionPropNNInnerMap Map { get; set; } = new();
+
+        [MapKey("nonexistant", true)]
+        public ReflectionPropNNNonexistant Nonexistant { get; set; } = new();
+
+        [MapKey("uint128")]
+        public BigInteger Uint128 { get; set; }
+
+        [MapKey("uint16")]
+        public int Uint16 { get; set; }
+
+        [MapKey("uint32")]
+        public long Uint32 { get; set; }
+
+        [MapKey("uint64")]
+        public ulong Uint64 { get; set; }
+
+        [MapKey("utf8_string")]
+        public string Utf8String { get; set; } = "";
     }
 }
